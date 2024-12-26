@@ -43,6 +43,26 @@ const blogSchema = new mongoose.Schema({
 });
 const Blog = mongoose.model("Blog", blogSchema);
 
+// Skills
+app.post("/skills", async (req, res) => {
+  try {
+    const skill = new Skill(req.body);
+    const savedSkill = await skill.save();
+    res.status(201).json(savedSkill);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get("/skills", async (req: Request, res: Response) => {
+  try {
+    const skills = await Skill.find();
+    res.json(skills);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Create a project
 app.post("/projects", async (req: Request, res: Response) => {
   try {

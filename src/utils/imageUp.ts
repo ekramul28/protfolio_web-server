@@ -14,11 +14,6 @@ interface ImageBBResponse {
   };
 }
 
-/**
- * Uploads an image to ImageBB and returns the image URL.
- * @param imageData - Base64 string or binary image data to be uploaded
- * @returns A promise that resolves to the URL of the uploaded image
- */
 export const uploadImageToImageBB = async (
   imageData: string | Blob
 ): Promise<string> => {
