@@ -12,11 +12,6 @@ const PORT = process.env.PORT || 3000;
 // Middleware to parse JSON
 app.use(express.json());
 
-// Ensure JWT_SECRET is defined
-if (!process.env.JWT_SECRET) {
-  throw new Error("JWT_SECRET is not defined in .env");
-}
-
 // MongoDB connection
 mongoose
   .connect(process.env.MONGODB_URI as string)
