@@ -60,9 +60,9 @@ const Blog = mongoose.model("Blog", blogSchema);
 // Register API
 
 app.post("/register", async (req: any, res: any) => {
-  const { email, password } = req.body;
-  console.log(req.body);
   try {
+    console.log(req.body);
+    const { email, password } = req.body;
     // Check if email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser)
@@ -85,9 +85,8 @@ app.post("/register", async (req: any, res: any) => {
 
 // Login API
 app.post("/login", async (req: any, res: any) => {
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = req.body;
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
