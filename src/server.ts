@@ -61,6 +61,7 @@ const Blog = mongoose.model("Blog", blogSchema);
 
 app.post("/register", async (req: any, res: any) => {
   const { email, password } = req.body;
+  console.log(req.body);
   try {
     // Check if email already exists
     const existingUser = await User.findOne({ email });
@@ -69,7 +70,7 @@ app.post("/register", async (req: any, res: any) => {
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    console.log(hashedPassword);
     // Save the user
     const user = new User({ email, password: hashedPassword });
     const savedUser = await user.save();
