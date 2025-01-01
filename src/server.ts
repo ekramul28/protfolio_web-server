@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { uploadImageToImageBB } from "./utils/imageUp";
+import cors from "cors";
 
 dotenv.config();
 const app = express();
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware to parse JSON
 app.use(express.json());
+app.use(cors({ origin: "*" }));
 
 // MongoDB connection
 mongoose
