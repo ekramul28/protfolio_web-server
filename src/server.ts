@@ -156,7 +156,7 @@ app.get("/skills", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/level2", async (req: Request, res: Response) => {
+app.get("/level", async (req: Request, res: Response) => {
   try {
     const skills2 = await SkillLevel2.find();
     res.json(skills2);
