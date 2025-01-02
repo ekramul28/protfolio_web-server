@@ -188,6 +188,21 @@ app.get("/projects", async (req: Request, res: Response) => {
   }
 });
 
+app.get("/projects/:id", async (req: any, res: any) => {
+  try {
+    const { id } = req.params; // Extract the project ID from the request parameters
+    const project = await Project.findById(id);
+
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    res.json(project);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Create a blog
 app.post("/blogs", async (req: Request, res: Response) => {
   try {
