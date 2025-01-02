@@ -17,7 +17,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "*",
-      "https://ekramul-protfolio.vercel.app/",
+      "https://ekramul-protfolio.vercel.app",
     ],
   })
 );
@@ -162,6 +162,7 @@ app.get("/level", async (req: Request, res: Response) => {
     res.json(skills2);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
+    console.log(err);
   }
 });
 
