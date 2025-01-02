@@ -158,8 +158,8 @@ app.get("/skills", async (req: Request, res: Response) => {
 
 app.get("/level2", async (req: Request, res: Response) => {
   try {
-    const skills = await SkillLevel2.find();
-    res.json(skills);
+    const skills2 = await SkillLevel2.find();
+    res.json(skills2);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
