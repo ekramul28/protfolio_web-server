@@ -12,7 +12,15 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware to parse JSON
 app.use(express.json());
-app.use(cors({ origin: ["http://localhost:3000", "*"] }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "*",
+      "https://ekramul-protfolio.vercel.app/",
+    ],
+  })
+);
 
 // MongoDB connection
 mongoose
