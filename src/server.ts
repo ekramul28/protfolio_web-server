@@ -147,10 +147,45 @@ app.post("/level", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/skills", async (req: Request, res: Response) => {
+app.get("/skills", async (req: any, res: any) => {
   try {
     const skills = await Skill.find();
     res.json(skills);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.put("/skills/:id", async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const updatedData = req.body;
+
+    const updatedSkill = await Skill.findByIdAndUpdate(id, updatedData, {
+      new: true, // Return the updated document
+      runValidators: true, // Ensure validation is run on the updated fields
+    });
+
+    if (!updatedSkill) {
+      return res.status(404).json({ error: "Skill not found" });
+    }
+
+    res.json(updatedSkill);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/skills/:id", async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+
+    const deletedSkill = await Skill.findByIdAndDelete(id);
+
+    if (!deletedSkill) {
+      return res.status(404).json({ error: "Skill not found" });
+    }
+
+    res.json({ message: "Skill deleted successfully" });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -163,6 +198,42 @@ app.get("/level", async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({ error: err.message });
     console.log(err);
+  }
+});
+
+app.put("/level/:id", async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const updatedData = req.body;
+
+    const updatedSkill = await SkillLevel2.findByIdAndUpdate(id, updatedData, {
+      new: true, // Return the updated document
+      runValidators: true, // Ensure validation is run on the updated fields
+    });
+
+    if (!updatedSkill) {
+      return res.status(404).json({ error: "Skill not found" });
+    }
+
+    res.json(updatedSkill);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/level/:id", async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+
+    const deletedSkill = await SkillLevel2.findByIdAndDelete(id);
+
+    if (!deletedSkill) {
+      return res.status(404).json({ error: "Skill not found" });
+    }
+
+    res.json({ message: "Skill deleted successfully" });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -203,6 +274,40 @@ app.get("/projects/:id", async (req: any, res: any) => {
   }
 });
 
+app.put("/projects/:id", async (req: any, res: any) => {
+  try {
+    const { id } = req.params; // Extract the project ID from the request parameters
+    const updatedData = req.body; // Get updated project data from the request body
+
+    const updatedProject = await Project.findByIdAndUpdate(id, updatedData, {
+      new: true, // Return the updated document
+      runValidators: true, // Validate the updated fields
+    });
+
+    if (!updatedProject) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    res.json(updatedProject);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.delete("/projects/:id", async (req: any, res: any) => {
+  try {
+    const { id } = req.params; // Extract the project ID from the request parameters
+    const deletedProject = await Project.findByIdAndDelete(id);
+
+    if (!deletedProject) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    res.json({ message: "Project deleted successfully" });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Create a blog
 app.post("/blogs", async (req: Request, res: Response) => {
   try {
@@ -223,6 +328,53 @@ app.get("/blogs", async (req: Request, res: Response) => {
     res.status(500).json({ error: err.message });
   }
 });
+app.get("/blogs/:id", async (req: any, res: any) => {
+  try {
+    const { id } = req.params; // Extract the blog ID from the request parameters
+    const blog = await Blog.findById(id);
+
+    if (!blog) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+
+    res.json(blog);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.put("/blogs/:id", async (req: any, res: any) => {
+  try {
+    const { id } = req.params; // Extract the blog ID from the request parameters
+    const updatedData = req.body; // Get updated blog data from the request body
+
+    const updatedBlog = await Blog.findByIdAndUpdate(id, updatedData, {
+      new: true, // Return the updated document
+      runValidators: true, // Validate the updated fields
+    });
+
+    if (!updatedBlog) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+
+    res.json(updatedBlog);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.delete("/blogs/:id", async (req: any, res: any) => {
+  try {
+    const { id } = req.params; // Extract the blog ID from the request parameters
+    const deletedBlog = await Blog.findByIdAndDelete(id);
+
+    if (!deletedBlog) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+
+    res.json({ message: "Blog deleted successfully" });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Example route
 app.get("/", (req: Request, res: Response) => {
@@ -231,5 +383,5 @@ app.get("/", (req: Request, res: Response) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running ${PORT}`);
 });
