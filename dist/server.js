@@ -129,7 +129,7 @@ app.post("/skills", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         res.status(400).json({ error: err.message });
     }
 }));
-app.post("/level2", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/level", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const skill = new SkillLevel2(req.body);
         const savedSkill = yield skill.save();
@@ -148,6 +148,36 @@ app.get("/skills", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(500).json({ error: err.message });
     }
 }));
+app.put("/skills/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const updatedData = req.body;
+        const updatedSkill = yield Skill.findByIdAndUpdate(id, updatedData, {
+            new: true, // Return the updated document
+            runValidators: true, // Ensure validation is run on the updated fields
+        });
+        if (!updatedSkill) {
+            return res.status(404).json({ error: "Skill not found" });
+        }
+        res.json(updatedSkill);
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}));
+app.delete("/skills/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const deletedSkill = yield Skill.findByIdAndDelete(id);
+        if (!deletedSkill) {
+            return res.status(404).json({ error: "Skill not found" });
+        }
+        res.json({ message: "Skill deleted successfully" });
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}));
 app.get("/level", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const skills2 = yield SkillLevel2.find();
@@ -156,6 +186,36 @@ app.get("/level", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     catch (err) {
         res.status(500).json({ error: err.message });
         console.log(err);
+    }
+}));
+app.put("/level/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const updatedData = req.body;
+        const updatedSkill = yield SkillLevel2.findByIdAndUpdate(id, updatedData, {
+            new: true, // Return the updated document
+            runValidators: true, // Ensure validation is run on the updated fields
+        });
+        if (!updatedSkill) {
+            return res.status(404).json({ error: "Skill not found" });
+        }
+        res.json(updatedSkill);
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}));
+app.delete("/level/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const deletedSkill = yield SkillLevel2.findByIdAndDelete(id);
+        if (!deletedSkill) {
+            return res.status(404).json({ error: "Skill not found" });
+        }
+        res.json({ message: "Skill deleted successfully" });
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
     }
 }));
 // Create a project
@@ -174,6 +234,49 @@ app.get("/projects", (req, res) => __awaiter(void 0, void 0, void 0, function* (
     try {
         const projects = yield Project.find();
         res.json(projects);
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}));
+app.get("/projects/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params; // Extract the project ID from the request parameters
+        const project = yield Project.findById(id);
+        if (!project) {
+            return res.status(404).json({ error: "Project not found" });
+        }
+        res.json(project);
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}));
+app.put("/projects/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params; // Extract the project ID from the request parameters
+        const updatedData = req.body; // Get updated project data from the request body
+        const updatedProject = yield Project.findByIdAndUpdate(id, updatedData, {
+            new: true, // Return the updated document
+            runValidators: true, // Validate the updated fields
+        });
+        if (!updatedProject) {
+            return res.status(404).json({ error: "Project not found" });
+        }
+        res.json(updatedProject);
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}));
+app.delete("/projects/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params; // Extract the project ID from the request parameters
+        const deletedProject = yield Project.findByIdAndDelete(id);
+        if (!deletedProject) {
+            return res.status(404).json({ error: "Project not found" });
+        }
+        res.json({ message: "Project deleted successfully" });
     }
     catch (err) {
         res.status(500).json({ error: err.message });
@@ -200,11 +303,54 @@ app.get("/blogs", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(500).json({ error: err.message });
     }
 }));
+app.get("/blogs/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params; // Extract the blog ID from the request parameters
+        const blog = yield Blog.findById(id);
+        if (!blog) {
+            return res.status(404).json({ error: "Blog not found" });
+        }
+        res.json(blog);
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}));
+app.put("/blogs/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params; // Extract the blog ID from the request parameters
+        const updatedData = req.body; // Get updated blog data from the request body
+        const updatedBlog = yield Blog.findByIdAndUpdate(id, updatedData, {
+            new: true, // Return the updated document
+            runValidators: true, // Validate the updated fields
+        });
+        if (!updatedBlog) {
+            return res.status(404).json({ error: "Blog not found" });
+        }
+        res.json(updatedBlog);
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}));
+app.delete("/blogs/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params; // Extract the blog ID from the request parameters
+        const deletedBlog = yield Blog.findByIdAndDelete(id);
+        if (!deletedBlog) {
+            return res.status(404).json({ error: "Blog not found" });
+        }
+        res.json({ message: "Blog deleted successfully" });
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}));
 // Example route
 app.get("/", (req, res) => {
     res.send("Hello, World! This is a simple Express server.");
 });
 // Start the server
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running ${PORT}`);
 });
