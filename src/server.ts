@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware to parse JSON
 app.use(express.json());
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: ["http://localhost:3000", "*"] }));
 
 // MongoDB connection
 mongoose
@@ -35,22 +35,35 @@ const skillSchema = new mongoose.Schema({
 });
 const Skill = mongoose.model("Skill", skillSchema);
 
-const projectSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  techStack: [String],
-  githubLink: String,
-  liveDemo: String,
-  imageUrl: String, // To store the uploaded image URL
+const skillSchemaLevel2 = new mongoose.Schema({
+  name: { type: String, required: true },
+  level: { type: String, required: true },
 });
+const SkillLevel2 = mongoose.model("SkillLevel2", skillSchemaLevel2);
+
+const projectSchema = new mongoose.Schema({
+  projectName: { type: String, required: true },
+  description: { type: String, required: true },
+  startDate: { type: Date, required: true },
+  endDate: { type: Date, required: true },
+  frontendTechnologies: { type: [String], default: [] }, // Array of strings for frontend tech
+  backendTechnologies: { type: [String], default: [] }, // Array of strings for backend tech
+  images: { type: [String], default: [] }, // Array of image URLs
+  links: {
+    githubFrontend: { type: String, required: false },
+    githubBackend: { type: String, required: false },
+    liveDemo: { type: String, required: false },
+    watchVideo: { type: String, required: false },
+  },
+});
+
 const Project = mongoose.model("Project", projectSchema);
 
 const blogSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  content: { type: String, required: true },
-  author: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-  imageUrl: String, // To store the uploaded image URL
+  description: { type: String, required: true },
+  link: { type: String, required: true },
+  image: { type: String, required: true },
 });
 const Blog = mongoose.model("Blog", blogSchema);
 
@@ -58,7 +71,6 @@ const Blog = mongoose.model("Blog", blogSchema);
 
 app.post("/register", async (req: any, res: any) => {
   try {
-    console.log(req.body);
     const { email, password } = req.body;
     // Check if email already exists
     const existingUser = await User.findOne({ email });
@@ -67,7 +79,6 @@ app.post("/register", async (req: any, res: any) => {
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword);
     // Save the user
     const user = new User({ email, password: hashedPassword });
     const savedUser = await user.save();
@@ -118,6 +129,15 @@ app.post("/skills", async (req: Request, res: Response) => {
     res.status(400).json({ error: err.message });
   }
 });
+app.post("/level2", async (req: Request, res: Response) => {
+  try {
+    const skill = new SkillLevel2(req.body);
+    const savedSkill = await skill.save();
+    res.status(201).json(savedSkill);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
 app.get("/skills", async (req: Request, res: Response) => {
   try {
@@ -128,17 +148,20 @@ app.get("/skills", async (req: Request, res: Response) => {
   }
 });
 
+app.get("/level2", async (req: Request, res: Response) => {
+  try {
+    const skills = await SkillLevel2.find();
+    res.json(skills);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Create a project
 app.post("/projects", async (req: Request, res: Response) => {
   try {
-    const { image, ...projectData } = req.body;
+    const project = new Project(req.body);
 
-    let imageUrl = "";
-    if (image) {
-      imageUrl = await uploadImageToImageBB(image); // Upload image and get URL
-    }
-
-    const project = new Project({ ...projectData, imageUrl });
     const savedProject = await project.save();
     res.status(201).json(savedProject);
   } catch (err: any) {
@@ -159,14 +182,7 @@ app.get("/projects", async (req: Request, res: Response) => {
 // Create a blog
 app.post("/blogs", async (req: Request, res: Response) => {
   try {
-    const { image, ...blogData } = req.body;
-
-    let imageUrl = "";
-    if (image) {
-      imageUrl = await uploadImageToImageBB(image); // Upload image and get URL
-    }
-
-    const blog = new Blog({ ...blogData, imageUrl });
+    const blog = new Blog(req.body);
     const savedBlog = await blog.save();
     res.status(201).json(savedBlog);
   } catch (err: any) {
