@@ -8,17 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -28,16 +17,19 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const imageUp_1 = require("./utils/imageUp");
+const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3000;
 // Middleware to parse JSON
 app.use(express_1.default.json());
-// Ensure JWT_SECRET is defined
-if (!process.env.JWT_SECRET) {
-    throw new Error("JWT_SECRET is not defined in .env");
-}
+app.use((0, cors_1.default)({
+    origin: [
+        "http://localhost:3000",
+        "*",
+        "https://ekramul-protfolio.vercel.app",
+    ],
+}));
 // MongoDB connection
 mongoose_1.default
     .connect(process.env.MONGODB_URI)
@@ -55,35 +47,44 @@ const skillSchema = new mongoose_1.default.Schema({
     level: { type: String, required: true },
 });
 const Skill = mongoose_1.default.model("Skill", skillSchema);
+const skillSchemaLevel2 = new mongoose_1.default.Schema({
+    name: { type: String, required: true },
+    level: { type: String, required: true },
+});
+const SkillLevel2 = mongoose_1.default.model("SkillLevel2", skillSchemaLevel2);
 const projectSchema = new mongoose_1.default.Schema({
-    title: { type: String, required: true },
+    projectName: { type: String, required: true },
     description: { type: String, required: true },
-    techStack: [String],
-    githubLink: String,
-    liveDemo: String,
-    imageUrl: String, // To store the uploaded image URL
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: true },
+    frontendTechnologies: { type: [String], default: [] }, // Array of strings for frontend tech
+    backendTechnologies: { type: [String], default: [] }, // Array of strings for backend tech
+    images: { type: [String], default: [] }, // Array of image URLs
+    links: {
+        githubFrontend: { type: String, required: false },
+        githubBackend: { type: String, required: false },
+        liveDemo: { type: String, required: false },
+        watchVideo: { type: String, required: false },
+    },
 });
 const Project = mongoose_1.default.model("Project", projectSchema);
 const blogSchema = new mongoose_1.default.Schema({
     title: { type: String, required: true },
-    content: { type: String, required: true },
-    author: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now },
-    imageUrl: String, // To store the uploaded image URL
+    description: { type: String, required: true },
+    link: { type: String, required: true },
+    image: { type: String, required: true },
 });
 const Blog = mongoose_1.default.model("Blog", blogSchema);
 // Register API
 app.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
-    console.log(req.body);
     try {
+        const { email, password } = req.body;
         // Check if email already exists
         const existingUser = yield User.findOne({ email });
         if (existingUser)
             return res.status(400).json({ message: "Email already exists" });
         // Hash the password
         const hashedPassword = yield bcrypt_1.default.hash(password, 10);
-        console.log(hashedPassword);
         // Save the user
         const user = new User({ email, password: hashedPassword });
         const savedUser = yield user.save();
@@ -97,8 +98,8 @@ app.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 // Login API
 app.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
     try {
+        const { email, password } = req.body;
         // Check if user exists
         const user = yield User.findOne({ email });
         if (!user)
@@ -128,6 +129,16 @@ app.post("/skills", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         res.status(400).json({ error: err.message });
     }
 }));
+app.post("/level2", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const skill = new SkillLevel2(req.body);
+        const savedSkill = yield skill.save();
+        res.status(201).json(savedSkill);
+    }
+    catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+}));
 app.get("/skills", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const skills = yield Skill.find();
@@ -137,15 +148,20 @@ app.get("/skills", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(500).json({ error: err.message });
     }
 }));
+app.get("/level", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const skills2 = yield SkillLevel2.find();
+        res.json(skills2);
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+}));
 // Create a project
 app.post("/projects", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const _a = req.body, { image } = _a, projectData = __rest(_a, ["image"]);
-        let imageUrl = "";
-        if (image) {
-            imageUrl = yield (0, imageUp_1.uploadImageToImageBB)(image); // Upload image and get URL
-        }
-        const project = new Project(Object.assign(Object.assign({}, projectData), { imageUrl }));
+        const project = new Project(req.body);
         const savedProject = yield project.save();
         res.status(201).json(savedProject);
     }
@@ -166,12 +182,7 @@ app.get("/projects", (req, res) => __awaiter(void 0, void 0, void 0, function* (
 // Create a blog
 app.post("/blogs", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const _a = req.body, { image } = _a, blogData = __rest(_a, ["image"]);
-        let imageUrl = "";
-        if (image) {
-            imageUrl = yield (0, imageUp_1.uploadImageToImageBB)(image); // Upload image and get URL
-        }
-        const blog = new Blog(Object.assign(Object.assign({}, blogData), { imageUrl }));
+        const blog = new Blog(req.body);
         const savedBlog = yield blog.save();
         res.status(201).json(savedBlog);
     }

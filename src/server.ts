@@ -137,7 +137,7 @@ app.post("/skills", async (req: Request, res: Response) => {
     res.status(400).json({ error: err.message });
   }
 });
-app.post("/level2", async (req: Request, res: Response) => {
+app.post("/api/level2", async (req: Request, res: Response) => {
   try {
     const skill = new SkillLevel2(req.body);
     const savedSkill = await skill.save();
